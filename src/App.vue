@@ -29,6 +29,7 @@ import Calculator from "./components/Calculator.vue";
 - show operations on macbook touch bar (electron only i guess? if possible at all)
 - can have multiple calc components, all draggable. sort out z-index and shadow on focus.
   - z-index needs to be prop for consumers to decide best range?
+- separate calculator into 2 components; one for calculator and another for wrapping that in a draggable window.
 */
 
 export default {
