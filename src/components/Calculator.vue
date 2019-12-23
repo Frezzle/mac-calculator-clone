@@ -1,11 +1,15 @@
 <template>
   <div class="calc-wrapper">
     <span class="circles">
-      <span class="circle red"><span class="circle-symbol">×</span></span>
-      <span class="circle yellow">
+      <span class="circle red" @click="close"
+        ><span class="circle-symbol">×</span></span
+      >
+      <span class="circle yellow" @click="minimize">
         <span class="circle-symbol">&minus;</span>
       </span>
-      <span class="circle green"><span class="circle-symbol">+</span></span>
+      <span class="circle green" @click="expand"
+        ><span class="circle-symbol">+</span></span
+      >
     </span>
     <Display :value="display" />
     <div class="buttons">
@@ -48,12 +52,21 @@ export default {
     Display,
     Button
   },
+  props: {
+    debug: {
+      type: Boolean,
+      default: false
+    },
+    initialDisplay: {
+      type: String,
+      default: "0"
+    }
+  },
   data() {
     return {
-      debug: false,
       memory: 0,
       modifier: 0,
-      display: "0",
+      display: this.initialDisplay,
       op: null,
       activeOp: null,
       justCleared: true,
@@ -217,6 +230,15 @@ export default {
         default:
           return Number(y);
       }
+    },
+    close() {
+      this.$emit("close");
+    },
+    minimize() {
+      this.$emit("minimize");
+    },
+    expand() {
+      this.$emit("expand");
     }
   }
 };
@@ -241,6 +263,7 @@ export default {
 }
 .debug {
   color: white;
+  padding: 10px;
 }
 .circles {
   margin-left: 8px;
