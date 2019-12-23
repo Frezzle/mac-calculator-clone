@@ -11,7 +11,7 @@
         <span class="circle-symbol">+</span>
       </span>
     </span>
-    <Display :value="display" id="display" />
+    <Display :value="display" class="display" :class="`d-${uuid}`" />
     <div class="buttons">
       <Button
         :symbol="clearButtonValue"
@@ -31,6 +31,8 @@
       />
     </div>
     <div v-if="debug" class="debug">
+      <div>uuid = {{ uuid }}</div>
+      <br />
       <div>Window data:</div>
       <div>dragContainer = {{ dragContainer }}</div>
       <div>dragItem = {{ dragItem }}</div>
@@ -53,6 +55,7 @@
       <div>justPressedOp = {{ justPressedOp }}</div>
       <div>justEqualed = {{ justEqualed }}</div>
     </div>
+    <div class="window-inset-glow" />
   </div>
 </template>
 
@@ -66,6 +69,9 @@ export default {
     Button
   },
   props: {
+    uuid: {
+      default: 0
+    },
     debug: {
       type: Boolean,
       default: false
@@ -179,9 +185,10 @@ export default {
   },
   mounted() {
     this.dragContainer = document.getElementsByTagName("body")[0];
-    this.dragItem = document.getElementById("drag-item");
-    this.displayItem = document.getElementById("display");
+    this.dragItem = this.$el;
+    this.displayItem = this.$el.getElementsByClassName("display")[0];
 
+    // TODO use props to either set initial position relative to screen (top/left css props) or relative to parent component (useful for undocking scenario).
     this.setTranslate(
       this.initialWindowPosition.x,
       this.initialWindowPosition.y
@@ -302,15 +309,15 @@ export default {
       this.$emit("expand");
     },
     dragStart(e) {
-      if (e.type === "touchstart") {
-        this.initialX = e.touches[0].clientX - this.xOffset;
-        this.initialY = e.touches[0].clientY - this.yOffset;
-      } else {
-        this.initialX = e.clientX - this.xOffset;
-        this.initialY = e.clientY - this.yOffset;
-      }
-
       if (e.target === this.dragItem || e.target === this.displayItem) {
+        if (e.type === "touchstart") {
+          this.initialX = e.touches[0].clientX - this.xOffset;
+          this.initialY = e.touches[0].clientY - this.yOffset;
+        } else {
+          this.initialX = e.clientX - this.xOffset;
+          this.initialY = e.clientY - this.yOffset;
+        }
+
         this.dragActive = true;
       }
     },
@@ -347,12 +354,27 @@ export default {
 <style scoped>
 .calc-wrapper {
   background-color: #333539;
-  border-radius: 8px;
+  border-radius: 6px;
+  /* border: 1px solid #5d6067; */
+  border: 1px solid rgba(0, 0, 0, 1);
   overflow: hidden;
   user-select: none;
-  box-shadow: rgba(0.2, 0.2, 0.2, 0.4) 0px 0px 25px 15px;
+  box-shadow: 0 22px 40px 4px rgba(0, 0, 0, 0.56);
   width: 235px;
+  box-sizing: border-box;
   touch-action: none;
+  position: fixed;
+}
+.window-inset-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  pointer-events: none;
+  border-radius: 5px; /* less than the wrapper's border-radius, to copy visuals from OSX calc */
+  box-shadow: inset 0 1px #9c9fa78e, inset 0 -1px #85888f8e,
+    inset 1px 0 #85888f8e, inset -1px 0 #85888f8e; /* top is a bit brighter */
 }
 .buttons {
   display: grid;
@@ -373,10 +395,11 @@ export default {
 .circle {
   width: 12px;
   height: 12px;
-  border-radius: 20px;
+  border-radius: 50%;
   display: inline-flex;
   justify-content: center;
   align-items: center;
+  margin-top: 5px; /* fix why this needs to be so big; should only need to be 1px */
 }
 .circle:not(:first-of-type) {
   margin-left: 8px;
