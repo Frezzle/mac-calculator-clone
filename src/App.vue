@@ -2,6 +2,7 @@
   <div id="app">
     <Calculator
       v-if="showCalculator"
+      :initialWindowPosition="{ x: 200, y: 100 }"
       @close="close"
       @minimize="minimize"
       @expand="expand"
@@ -13,6 +14,7 @@
 import Calculator from "./components/Calculator.vue";
 
 /* TODO
+- fix bug: 6 divide 9 = C anyOp(?) causes infinity
 - better +/- symbol for negation
 - bigger minus symbol
 - same typeface/size/weight as macos calc app font
@@ -30,6 +32,13 @@ import Calculator from "./components/Calculator.vue";
 - can have multiple calc components, all draggable. sort out z-index and shadow on focus.
   - z-index needs to be prop for consumers to decide best range?
 - separate calculator into 2 components; one for calculator and another for wrapping that in a draggable window.
+- new taskbar-ish component that has icon for the app, handles window events properly (min, expand, close), and animates transition.
+  - has props for setting icon position and initial window position.
+- make all this into generic windowing system components, of which the calculator is an example of it being used.
+  - has slots for the window's content, e.g. calculator content or any other components.
+  - has slots(or props?) for custom child events that cause dragging (e.g. calculator display can cause dragging of parent window).
+  - potential components: AppWindow, AppTaskBar, AppIcon, CalculatorApp, CalculatorContent
+- get storybook up in this heezie to handle these components
 */
 
 export default {

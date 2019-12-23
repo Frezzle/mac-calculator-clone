@@ -73,6 +73,15 @@ export default {
     initialDisplay: {
       type: String,
       default: "0"
+    },
+    initialWindowPosition: {
+      type: Object,
+      default: () => {
+        return {
+          x: 0,
+          y: 0
+        };
+      }
     }
   },
   data() {
@@ -172,6 +181,11 @@ export default {
     this.dragContainer = document.getElementsByTagName("body")[0];
     this.dragItem = document.getElementById("drag-item");
     this.displayItem = document.getElementById("display");
+
+    this.setTranslate(
+      this.initialWindowPosition.x,
+      this.initialWindowPosition.y
+    );
 
     this.dragContainer.addEventListener("touchstart", this.dragStart, false);
     this.dragContainer.addEventListener("touchmove", this.drag, false);
@@ -317,13 +331,12 @@ export default {
           this.currentY = e.clientY - this.initialY;
         }
 
-        this.xOffset = this.currentX;
-        this.yOffset = this.currentY;
-
         this.setTranslate(this.currentX, this.currentY);
       }
     },
     setTranslate(xPos, yPos) {
+      this.xOffset = xPos;
+      this.yOffset = yPos;
       this.dragItem.style.transform =
         "translate3d(" + xPos + "px, " + yPos + "px, 0)";
     }
