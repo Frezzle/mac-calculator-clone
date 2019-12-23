@@ -1,17 +1,17 @@
 <template>
-  <div class="calc-wrapper">
+  <div class="calc-wrapper" id="drag-item">
     <span class="circles">
-      <span class="circle red" @click="close"
-        ><span class="circle-symbol">×</span></span
-      >
-      <span class="circle yellow" @click="minimize">
-        <span class="circle-symbol">&minus;</span>
+      <span class="circle red" @click="close">
+        <span class="circle-symbol">×</span>
       </span>
-      <span class="circle green" @click="expand"
-        ><span class="circle-symbol">+</span></span
-      >
+      <span class="circle yellow" @click="minimize">
+        <span class="circle-symbol">-</span>
+      </span>
+      <span class="circle green" @click="expand">
+        <span class="circle-symbol">+</span>
+      </span>
     </span>
-    <Display :value="display" />
+    <Display :value="display" id="display" />
     <div class="buttons">
       <Button
         :symbol="clearButtonValue"
@@ -31,6 +31,19 @@
       />
     </div>
     <div v-if="debug" class="debug">
+      <div>Window data:</div>
+      <div>dragContainer = {{ dragContainer }}</div>
+      <div>dragItem = {{ dragItem }}</div>
+      <div>displayItem = {{ displayItem }}</div>
+      <div>dragActive = {{ dragActive }}</div>
+      <div>currentX = {{ currentX }}</div>
+      <div>currentY = {{ currentY }}</div>
+      <div>initialX = {{ initialX }}</div>
+      <div>initialY = {{ initialY }}</div>
+      <div>xOffset = {{ xOffset }}</div>
+      <div>yOffset = {{ yOffset }}</div>
+      <br />
+      <div>Calculator data:</div>
       <div>display = {{ display }}</div>
       <div>memory = {{ memory }}</div>
       <div>modifier = {{ modifier }}</div>
@@ -64,6 +77,18 @@ export default {
   },
   data() {
     return {
+      // draggable window data
+      dragContainer: null,
+      dragItem: null,
+      displayItem: null,
+      dragActive: false,
+      currentX: null,
+      currentY: null,
+      initialX: null,
+      initialY: null,
+      xOffset: 0,
+      yOffset: 0,
+      // calc data
       memory: 0,
       modifier: 0,
       display: this.initialDisplay,
@@ -142,6 +167,28 @@ export default {
     clearButtonValue() {
       return this.justCleared ? "AC" : "C";
     }
+  },
+  mounted() {
+    this.dragContainer = document.getElementsByTagName("body")[0];
+    this.dragItem = document.getElementById("drag-item");
+    this.displayItem = document.getElementById("display");
+
+    this.dragContainer.addEventListener("touchstart", this.dragStart, false);
+    this.dragContainer.addEventListener("touchmove", this.drag, false);
+    this.dragContainer.addEventListener("touchend", this.dragEnd, false);
+
+    this.dragContainer.addEventListener("mousedown", this.dragStart, false);
+    this.dragContainer.addEventListener("mousemove", this.drag, false);
+    this.dragContainer.addEventListener("mouseup", this.dragEnd, false);
+  },
+  beforeDestroy() {
+    this.dragContainer.removeEventListener("touchstart", this.dragStart, false);
+    this.dragContainer.removeEventListener("touchmove", this.drag, false);
+    this.dragContainer.removeEventListener("touchend", this.dragEnd, false);
+
+    this.dragContainer.removeEventListener("mousedown", this.dragStart, false);
+    this.dragContainer.removeEventListener("mousemove", this.drag, false);
+    this.dragContainer.removeEventListener("mouseup", this.dragEnd, false);
   },
   methods: {
     onClear(val) {
@@ -239,6 +286,46 @@ export default {
     },
     expand() {
       this.$emit("expand");
+    },
+    dragStart(e) {
+      if (e.type === "touchstart") {
+        this.initialX = e.touches[0].clientX - this.xOffset;
+        this.initialY = e.touches[0].clientY - this.yOffset;
+      } else {
+        this.initialX = e.clientX - this.xOffset;
+        this.initialY = e.clientY - this.yOffset;
+      }
+
+      if (e.target === this.dragItem || e.target === this.displayItem) {
+        this.dragActive = true;
+      }
+    },
+    dragEnd() {
+      this.initialX = this.currentX;
+      this.initialY = this.currentY;
+      this.dragActive = false;
+    },
+    drag(e) {
+      if (this.dragActive) {
+        e.preventDefault();
+
+        if (e.type === "touchmove") {
+          this.currentX = e.touches[0].clientX - this.initialX;
+          this.currentY = e.touches[0].clientY - this.initialY;
+        } else {
+          this.currentX = e.clientX - this.initialX;
+          this.currentY = e.clientY - this.initialY;
+        }
+
+        this.xOffset = this.currentX;
+        this.yOffset = this.currentY;
+
+        this.setTranslate(this.currentX, this.currentY);
+      }
+    },
+    setTranslate(xPos, yPos) {
+      this.dragItem.style.transform =
+        "translate3d(" + xPos + "px, " + yPos + "px, 0)";
     }
   }
 };
@@ -251,6 +338,8 @@ export default {
   overflow: hidden;
   user-select: none;
   box-shadow: rgba(0.2, 0.2, 0.2, 0.4) 0px 0px 25px 15px;
+  width: 235px;
+  touch-action: none;
 }
 .buttons {
   display: grid;
@@ -304,5 +393,8 @@ export default {
 }
 .circles:hover .circle-symbol {
   visibility: visible;
+}
+#drag-item {
+  touch-action: none; /* needed? */
 }
 </style>
