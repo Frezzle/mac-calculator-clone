@@ -354,7 +354,7 @@ export default {
 <style scoped>
 .calc-wrapper {
   background-color: #333539;
-  border-radius: 6px;
+  border-radius: 12px;
   /* border: 1px solid #5d6067; */
   border: 1px solid rgba(0, 0, 0, 1);
   overflow: hidden;
@@ -372,7 +372,7 @@ export default {
   bottom: 0;
   right: 0;
   pointer-events: none;
-  border-radius: 5px; /* less than the wrapper's border-radius, to copy visuals from OSX calc */
+  border-radius: 11px; /* less than the wrapper's border-radius, to copy visuals from OSX calc */
   box-shadow: inset 0 1px #9c9fa78e, inset 0 -1px #85888f8e,
     inset 1px 0 #85888f8e, inset -1px 0 #85888f8e; /* top is a bit brighter */
 }
