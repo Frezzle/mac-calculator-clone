@@ -1,24 +1,7 @@
 # calc
 
-## Project setup
-```
-yarn install
-```
+Seeing how closely I could replicate MacOS's calculator.
 
-### Compiles and hot-reloads for development
-```
-yarn serve
-```
+Can you tell which one is the imposter?
 
-### Compiles and minifies for production
-```
-yarn build
-```
-
-### Lints and fixes files
-```
-yarn lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+![](src/assets/no-shoot-him.png)
